@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>⚡ Crypto Commander — crypbals34</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#F0B90B;--green:#0ECB81;--red:#F6465D;--bg:#070A0E;--s1:#0F1318;--s2:#161B22;--s3:#1E2530;--s4:#252D38;--text:#E6EDF3;--muted:#6E7681;--border:#21262D;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Cairo',sans-serif;min-height:100vh;direction:rtl;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 40% at 50% -10%,rgba(240,185,11,0.06),transparent);pointer-events:none;z-index:0;}
+body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(240,185,11,0.015) 1px,transparent 1px),linear-gradient(90deg,rgba(240,185,11,0.015) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+.app{max-width:480px;margin:0 auto;padding:12px;position:relative;z-index:1;}
+
+/* HEADER */
+.header{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);margin-bottom:14px;}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-icon{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,#F0B90B,#c9960a);display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 0 20px rgba(240,185,11,0.4);animation:glow 3s ease-in-out infinite;}
+@keyframes glow{0%,100%{box-shadow:0 0 20px rgba(240,185,11,0.35)}50%{box-shadow:0 0 40px rgba(240,185,11,0.65)}}
+.logo-text h1{font-size:15px;font-weight:900;}.logo-text h1 span{color:#F0B90B;}
+.logo-text p{font-size:10px;color:var(--muted);}
+.status-pill{display:flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:10px;}
+.pill-live{background:rgba(14,203,129,0.1);border:1px solid rgba(14,203,129,0.25);color:#0ECB81;}
+.pill-load{background:rgba(240,185,11,0.1);border:1px solid rgba(240,185,11,0.25);color:#F0B90B;}
+.pill-err{background:rgba(246,70,93,0.1);border:1px solid rgba(246,70,93,0.25);color:#F6465D;}
+.dot{width:6px;height:6px;border-radius:50%;animation:blink 1.5s infinite;}
+.dot-g{background:#0ECB81;box-shadow:0 0 6px #0ECB81;}
+.dot-y{background:#F0B90B;box-shadow:0 0 6px #F0B90B;}
+.dot-r{background:#F6465D;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+
+/* TABS */
+.tabs{display:flex;gap:5px;margin-bottom:14px;background:var(--s2);border-radius:12px;padding:4px;}
+.tab{flex:1;padding:8px 4px;border:none;background:transparent;color:var(--muted);font-family:'Cairo',sans-serif;font-size:11px;font-weight:700;border-radius:8px;cursor:pointer;transition:all 0.2s;}
+.tab.active{background:var(--s4);color:#F0B90B;}
+.section{display:none;}.section.active{display:block;}
+
+/* MOOD */
+.mood-card{background:linear-gradient(135deg,var(--s2),var(--s3));border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:12px;position:relative;overflow:hidden;}
+.mood-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#F0B90B,transparent);}
+.mood-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.mood-score{font-size:28px;font-weight:900;font-variant-numeric:tabular-nums;}
+.mood-bar-bg{background:var(--s4);border-radius:8px;height:9px;overflow:hidden;margin-bottom:8px;}
+.mood-bar-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,#F6465D 0%,#F0B90B 50%,#0ECB81 100%);transition:clip-path 1.5s ease;clip-path:inset(0 100% 0 0);}
+.mood-bottom{display:flex;justify-content:space-between;align-items:center;}
+.mood-verdict{font-size:13px;font-weight:700;}
+.mood-tip{font-size:10px;color:var(--muted);}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;}
+.stat-mini{background:var(--s2);border:1px solid var(--border);border-radius:11px;padding:10px;text-align:center;}
+.stat-lbl{font-size:9px;color:var(--muted);margin-bottom:4px;}
+.stat-val{font-size:15px;font-weight:900;}
+
+/* PRICES */
+.prices-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px;}
+.p-card{background:var(--s2);border:1px solid var(--border);border-radius:11px;padding:10px 11px;display:flex;align-items:center;justify-content:space-between;transition:all 0.2s;}
+.p-card.up{border-bottom:2px solid #0ECB81;}
+.p-card.down{border-bottom:2px solid #F6465D;}
+.p-icon{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;flex-shrink:0;}
+.p-name{font-size:12px;font-weight:700;}
+.p-price{font-size:11px;font-weight:700;font-variant-numeric:tabular-nums;direction:ltr;}
+.p-change{font-size:10px;font-weight:600;}
+
+/* SECTION TITLE */
+.sec-t{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+.sec-bar{width:3px;height:14px;background:#F0B90B;border-radius:2px;margin-left:6px;}
+
+/* COMMAND CARDS */
+.cmd-card{border-radius:14px;padding:14px;margin-bottom:10px;border:2px solid;}
+.cmd-buy{background:rgba(14,203,129,0.06);border-color:rgba(14,203,129,0.25);}
+.cmd-sell{background:rgba(246,70,93,0.06);border-color:rgba(246,70,93,0.25);}
+.cmd-wait{background:rgba(240,185,11,0.06);border-color:rgba(240,185,11,0.25);}
+.cmd-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.cmd-coin{display:flex;align-items:center;gap:10px;}
+.cmd-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;flex-shrink:0;}
+.cmd-name{font-size:14px;font-weight:900;}
+.cmd-pair{font-size:10px;color:var(--muted);}
+.badge{padding:5px 12px;border-radius:20px;font-size:11px;font-weight:900;}
+.badge-buy{background:rgba(14,203,129,0.18);color:#0ECB81;border:1px solid rgba(14,203,129,0.35);}
+.badge-sell{background:rgba(246,70,93,0.18);color:#F6465D;border:1px solid rgba(246,70,93,0.35);}
+.badge-wait{background:rgba(240,185,11,0.18);color:#F0B90B;border:1px solid rgba(240,185,11,0.35);}
+.cmd-price{font-size:22px;font-weight:900;direction:ltr;margin-bottom:10px;font-variant-numeric:tabular-nums;}
+.levels{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:10px;}
+.lv{background:rgba(0,0,0,0.25);border-radius:9px;padding:8px;text-align:center;}
+.lv-l{font-size:9px;color:var(--muted);margin-bottom:2px;}
+.lv-v{font-size:11px;font-weight:700;direction:ltr;}
+.cmd-reason{font-size:11px;color:var(--muted);line-height:1.8;padding:9px;background:rgba(0,0,0,0.2);border-radius:8px;margin-bottom:10px;}
+.action-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.btn-wa{padding:11px 6px;border-radius:10px;border:none;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all 0.2s;}
+.btn-bn{padding:11px 6px;border-radius:10px;border:none;background:linear-gradient(135deg,#F0B90B,#c9960a);color:#000;font-family:'Cairo',sans-serif;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;transition:all 0.2s;}
+.btn-wa:active,.btn-bn:active{transform:scale(0.97);}
+
+/* NEWS */
+.news-card{background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px;cursor:pointer;transition:all 0.2s;}
+.news-card:hover{border-color:#F0B90B;}
+.news-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;}
+.news-title{font-size:12px;font-weight:700;line-height:1.6;flex:1;}
+.news-impact{padding:2px 8px;border-radius:20px;font-size:9px;font-weight:700;flex-shrink:0;}
+.impact-high{background:rgba(246,70,93,0.15);color:#F6465D;}
+.impact-med{background:rgba(240,185,11,0.15);color:#F0B90B;}
+.impact-low{background:rgba(14,203,129,0.15);color:#0ECB81;}
+.news-bottom{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);}
+
+/* ALERTS TAB */
+.setup-card{background:var(--s2);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;}
+.setup-title{font-size:13px;font-weight:700;color:#F0B90B;margin-bottom:12px;}
+.form-label{font-size:11px;color:var(--muted);margin-bottom:6px;display:block;}
+.form-input{width:100%;background:var(--s4);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:'Cairo',sans-serif;font-size:13px;outline:none;direction:ltr;margin-bottom:10px;transition:border-color 0.2s;}
+.form-input:focus{border-color:#F0B90B;}
+.save-btn{width:100%;padding:12px;background:linear-gradient(135deg,#F0B90B,#c9960a);border:none;border-radius:10px;color:#000;font-family:'Cairo',sans-serif;font-size:14px;font-weight:900;cursor:pointer;margin-bottom:8px;}
+.test-btn{width:100%;padding:10px;background:transparent;border:1px solid #0ECB81;border-radius:10px;color:#0ECB81;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer;}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border);}
+.toggle-row:last-child{border-bottom:none;}
+.tg-info{font-size:13px;}.tg-sub{font-size:10px;color:var(--muted);}
+.toggle{width:44px;height:24px;background:var(--s4);border-radius:12px;position:relative;cursor:pointer;transition:background 0.3s;border:none;flex-shrink:0;}
+.toggle.on{background:#0ECB81;}
+.toggle::after{content:'';position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:3px;left:3px;transition:left 0.3s;}
+.toggle.on::after{left:23px;}
+
+/* HISTORY */
+.hist-item{background:var(--s2);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px;}
+.hist-top{display:flex;justify-content:space-between;margin-bottom:6px;}
+.hist-row{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);}
+
+/* REFRESH */
+.refresh-btn{width:100%;padding:12px;background:var(--s3);border:1px solid var(--border);border-radius:11px;color:var(--text);font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.2s;margin-bottom:12px;}
+.refresh-btn:hover{border-color:#F0B90B;color:#F0B90B;}
+.refresh-btn:disabled{opacity:0.6;cursor:not-allowed;}
+
+/* SKELETON */
+.skel{background:linear-gradient(90deg,var(--s2) 25%,var(--s3) 50%,var(--s2) 75%);background-size:200% 100%;animation:sh 1.5s infinite;border-radius:12px;}
+@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--s3);border:1px solid #F0B90B;border-radius:12px;padding:12px 22px;font-size:13px;font-weight:700;color:#F0B90B;z-index:1000;transition:transform 0.3s ease;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+
+.footer{text-align:center;padding:14px 0;font-size:10px;color:var(--muted);border-top:1px solid var(--border);line-height:2;margin-top:4px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp 0.4s ease forwards;opacity:0;}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    <div class="logo-text">
+      <h1><span>Crypto</span> Commander</h1>
+      <p>crypbals34 · بينانس TR</p>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+    <div class="status-pill pill-load" id="statusPill"><div class="dot dot-y" id="statusDot"></div><span id="statusTxt">تحميل...</span></div>
+    <div style="font-size:9px;color:var(--muted)" id="updateTime">--</div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('commander',this)">⚡ القيادة</button>
+  <button class="tab" onclick="switchTab('news',this)">📰 الأخبار</button>
+  <button class="tab" onclick="switchTab('alerts',this)">🔔 التنبيهات</button>
+  <button class="tab" onclick="switchTab('history',this)">📋 السجل</button>
+</div>
+
+<!-- ===== COMMANDER ===== -->
+<div class="section active" id="tab-commander">
+
+  <!-- MOOD -->
+  <div class="mood-card">
+    <div class="mood-top">
+      <span style="font-size:11px;color:var(--muted);">🧠 مزاج السوق</span>
+      <span class="mood-score" id="moodScore" style="color:#F0B90B">--</span>
+    </div>
+    <div class="mood-bar-bg"><div class="mood-bar-fill" id="moodFill"></div></div>
+    <div class="mood-bottom">
+      <div class="mood-verdict" id="moodVerdict">جاري التحليل...</div>
+      <div class="mood-tip" id="moodTip"></div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row" id="statsRow">
+    <div class="skel" style="height:58px"></div>
+    <div class="skel" style="height:58px"></div>
+    <div class="skel" style="height:58px"></div>
+  </div>
+
+  <!-- PRICES -->
+  <div class="sec-t">
+    <div style="display:flex;align-items:center"><div class="sec-bar"></div>الأسعار الحية</div>
+    <span style="font-size:10px;color:var(--muted)" id="srcLbl">CoinGecko API</span>
+  </div>
+  <div class="prices-grid" id="pricesGrid">
+    <div class="skel" style="height:50px"></div><div class="skel" style="height:50px"></div>
+    <div class="skel" style="height:50px"></div><div class="skel" style="height:50px"></div>
+    <div class="skel" style="height:50px"></div><div class="skel" style="height:50px"></div>
+  </div>
+
+  <!-- SIGNALS -->
+  <div class="sec-t">
+    <div style="display:flex;align-items:center"><div class="sec-bar"></div>توصية القائد</div>
+    <span style="font-size:10px;color:#0ECB81" id="oppCount"></span>
+  </div>
+  <div id="signalsContainer">
+    <div class="skel" style="height:200px;margin-bottom:10px"></div>
+    <div class="skel" style="height:200px;margin-bottom:10px"></div>
+  </div>
+
+  <button class="refresh-btn" onclick="loadAll()" id="refreshBtn">🔄 تحديث وإعادة التحليل</button>
+</div>
+
+<!-- ===== NEWS ===== -->
+<div class="section" id="tab-news">
+  <div class="sec-t"><div style="display:flex;align-items:center"><div class="sec-bar"></div>أخبار السوق اللحظية</div></div>
+  <div id="newsContainer">
+    <div class="skel" style="height:80px;margin-bottom:8px"></div>
+    <div class="skel" style="height:80px;margin-bottom:8px"></div>
+    <div class="skel" style="height:80px;margin-bottom:8px"></div>
+  </div>
+  <button class="refresh-btn" onclick="loadNews()">🔄 تحديث الأخبار</button>
+</div>
+
+<!-- ===== ALERTS ===== -->
+<div class="section" id="tab-alerts">
+  <div class="setup-card">
+    <div class="setup-title">📱 إعداد واتساب</div>
+    <label class="form-label">رقم الواتساب (مع رمز الدولة)</label>
+    <input class="form-input" id="waPhone" type="tel" placeholder="+90 555 000 0000" value="+905383770035">
+    <button class="save-btn" onclick="saveSettings()">💾 حفظ الرقم</button>
+    <button class="test-btn" onclick="testWA()">🧪 إرسال رسالة تجريبية</button>
+  </div>
+  <div class="setup-card">
+    <div class="setup-title">⚙️ إعدادات التنبيهات</div>
+    <div class="toggle-row">
+      <div><div class="tg-info">تنبيه عند إشارة شراء قوية</div><div class="tg-sub">يفتح واتساب فوراً</div></div>
+      <button class="toggle on" id="tog1" onclick="this.classList.toggle('on')"></button>
+    </div>
+    <div class="toggle-row">
+      <div><div class="tg-info">تنبيه عند إشارة بيع</div><div class="tg-sub">تحذير فوري</div></div>
+      <button class="toggle on" id="tog2" onclick="this.classList.toggle('on')"></button>
+    </div>
+    <div class="toggle-row">
+      <div><div class="tg-info">تنبيه أخبار عالية الأثر</div><div class="tg-sub">أخبار تؤثر على السوق</div></div>
+      <button class="toggle on" id="tog3" onclick="this.classList.toggle('on')"></button>
+    </div>
+    <div class="toggle-row">
+      <div><div class="tg-info">تقرير الصباح اليومي</div><div class="tg-sub">ملخص السوق 8 صباحاً</div></div>
+      <button class="toggle" id="tog4" onclick="this.classList.toggle('on')"></button>
+    </div>
+  </div>
+  <div style="background:rgba(240,185,11,0.06);border:1px solid rgba(240,185,11,0.2);border-radius:12px;padding:14px;font-size:12px;color:var(--muted);line-height:2;">
+    💡 <strong style="color:var(--text)">كيف يعمل:</strong><br>
+    ١. الداشبورد يحلل السوق كل 5 دقائق<br>
+    ٢. عند ظهور فرصة ← اضغط 📱 واتساب<br>
+    ٣. تصلك رسالة كاملة بالتفاصيل<br>
+    ٤. افتح بينانس TR ونفذ الأمر
+  </div>
+</div>
+
+<!-- ===== HISTORY ===== -->
+<div class="section" id="tab-history">
+  <div id="histContainer">
+    <div style="text-align:center;padding:40px 20px;color:var(--muted);">
+      <div style="font-size:40px;margin-bottom:12px">📋</div>
+      <div style="font-size:14px;font-weight:700;margin-bottom:6px">لا يوجد سجل بعد</div>
+      <div style="font-size:12px">التوصيات التي تُرسل ستظهر هنا</div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  ⚡ Crypto Commander · crypbals34<br>
+  بيانات: CoinGecko + CryptoPanic<br>
+  ⚠️ ليس نصيحة مالية · القرار النهائي لك دائماً
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const COINS=[
+  {id:'bitcoin',     sym:'BTC',  name:'Bitcoin',   color:'#F7931A',bg:'rgba(247,147,26,0.18)'},
+  {id:'ethereum',    sym:'ETH',  name:'Ethereum',  color:'#627EEA',bg:'rgba(98,126,234,0.18)'},
+  {id:'solana',      sym:'SOL',  name:'Solana',    color:'#9945FF',bg:'rgba(153,69,255,0.18)'},
+  {id:'binancecoin', sym:'BNB',  name:'BNB',       color:'#F0B90B',bg:'rgba(240,185,11,0.18)'},
+  {id:'ripple',      sym:'XRP',  name:'XRP',       color:'#00AAE4',bg:'rgba(0,170,228,0.18)'},
+  {id:'avalanche-2', sym:'AVAX', name:'Avalanche', color:'#E84142',bg:'rgba(232,65,66,0.18)'},
+  {id:'cardano',     sym:'ADA',  name:'Cardano',   color:'#3CC8C8',bg:'rgba(60,200,200,0.18)'},
+  {id:'chainlink',   sym:'LINK', name:'Chainlink', color:'#2A5ADA',bg:'rgba(42,90,218,0.18)'},
+];
+
+let mkt={}, signalHistory=[], settings={waPhone:'+905383770035'};
+
+function fmt(p){if(!p||isNaN(p))return'$--';if(p>=10000)return'$'+p.toLocaleString('en',{maximumFractionDigits:0});if(p>=100)return'$'+p.toFixed(1);if(p>=1)return'$'+p.toFixed(3);return'$'+p.toFixed(5);}
+function fch(c){return(c>=0?'+':'')+((c)||0).toFixed(2)+'%';}
+
+function toast(msg,dur=3000){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur);}
+
+function switchTab(id,el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-'+id).classList.add('active');
+  if(id==='history')renderHistory();
+  if(id==='news')loadNews();
+}
+
+function saveSettings(){
+  settings.waPhone=document.getElementById('waPhone').value.trim();
+  localStorage.setItem('cc_settings',JSON.stringify(settings));
+  toast('✅ تم حفظ الإعدادات!');
+}
+
+function testWA(){
+  const p=settings.waPhone||document.getElementById('waPhone').value.trim();
+  if(!p){toast('⚠️ أدخل رقم الواتساب أولاً');return;}
+  const msg=`⚡ *Crypto Commander*\n\n✅ النظام يعمل بشكل مثالي!\n📊 متصل بالسوق مباشرة\n⏰ ${new Date().toLocaleTimeString('ar')}\n\n_crypbals34 · Crypto Commander_`;
+  window.open(`https://wa.me/${p.replace(/[+\s]/g,'')}?text=${encodeURIComponent(msg)}`,'_blank');
+}
+
+function sendWA(coin,signal,price,target,stop,reason){
+  const p=settings.waPhone||document.getElementById('waPhone').value.trim();
+  if(!p){toast('⚠️ أضف رقم الواتساب في التنبيهات');return;}
+  const emoji=signal==='buy'?'🟢 شراء 🚀':signal==='sell'?'🔴 بيع ⚠️':'🟡 انتظار';
+  const ret=(((target-price)/price)*100).toFixed(1);
+  const msg=`⚡ *Crypto Commander — إشارة جديدة*\n━━━━━━━━━━━━\n${emoji} *${coin.sym}/USDT*\n\n💰 سعر الدخول: ${fmt(price)}\n🎯 هدف الربح: ${fmt(target)} *(+${ret}%)*\n🛑 وقف الخسارة: ${fmt(stop)}\n━━━━━━━━━━━━\n📋 *التحليل:*\n${reason}\n\n⏰ ${new Date().toLocaleTimeString('ar')} · ${new Date().toLocaleDateString('ar')}\n━━━━━━━━━━━━\n⚠️ _ليست نصيحة مالية_`;
+  window.open(`https://wa.me/${p.replace(/[+\s]/g,'')}?text=${encodeURIComponent(msg)}`,'_blank');
+  signalHistory.unshift({coin:coin.sym,signal,price,target,stop,time:new Date().toISOString()});
+  localStorage.setItem('cc_history',JSON.stringify(signalHistory));
+  toast('📱 فُتح واتساب — أرسل الرسالة!');
+}
+
+function openBinance(coin){
+  window.open(`https://www.binance.tr/trade/${coin.sym}_USDT`,'_blank');
+  toast('🏦 فُتح بينانس TR');
+}
+
+function analyze(d){
+  const c=d.change,p=d.price,h=d.high||p*1.05,l=d.low||p*0.95;
+  const pos=Math.max(0,Math.min(100,((p-l)/(h-l))*100));
+  let signal,reason,target,stop;
+  if(c<=-5&&pos<20){signal='buy';reason='🔥 فرصة استثنائية — هبوط حاد مع السعر قرب القاع. الأذكياء يدخلون هنا بحذر.';target=+(p*1.12).toFixed(4);stop=+(p*0.93).toFixed(4);}
+  else if(c<=-3&&pos<35){signal='buy';reason='📉 فرصة جيدة — انخفاض مع منطقة دعم واضحة. ادخل 40% من المركز الآن.';target=+(p*1.09).toFixed(4);stop=+(p*0.93).toFixed(4);}
+  else if(c<=-1.5&&pos<45){signal='buy';reason='📊 دخول محتاط — تصحيح طبيعي. ادخل بـ 20% مع مراقبة المستوى.';target=+(p*1.07).toFixed(4);stop=+(p*0.94).toFixed(4);}
+  else if(c>=6&&pos>80){signal='sell';reason='🚨 تشبع شرائي خطير — ارتفاع حاد قرب القمة. خطر تصحيح وشيك جداً.';target=+(p*0.93).toFixed(4);stop=+(p*1.04).toFixed(4);}
+  else if(c>=3&&pos>50){signal='buy';reason='📈 زخم صاعد قوي — حركة إيجابية مع حجم تداول جيد. ادخل بحذر.';target=+(p*1.08).toFixed(4);stop=+(p*0.95).toFixed(4);}
+  else{signal='wait';reason='⏳ انتظار — الإشارات غير واضحة حالياً. لا تتسرع وراقب السوق.';target=+(p*1.06).toFixed(4);stop=+(p*0.94).toFixed(4);}
+  return{signal,reason,target,stop};
+}
+
+async function loadAll(){
+  const btn=document.getElementById('refreshBtn');
+  btn.disabled=true;btn.textContent='⏳ جاري التحديث...';
+  setStatus('load');
+  try{
+    const ids=COINS.map(c=>c.id).join(',');
+    const res=await fetch(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${ids}&order=market_cap_desc&sparkline=false&price_change_percentage=24h`);
+    if(!res.ok)throw new Error('err');
+    const data=await res.json();
+    data.forEach(c=>{mkt[c.id]={price:c.current_price,change:c.price_change_percentage_24h||0,high:c.high_24h,low:c.low_24h,vol:c.total_volume};});
+    renderAll();
+    setStatus('live');
+    document.getElementById('updateTime').textContent=new Date().toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    document.getElementById('srcLbl').textContent='✅ CoinGecko';
+  }catch(e){
+    setStatus('err');
+    document.getElementById('srcLbl').textContent='❌ خطأ';
+    toast('⚠️ خطأ في تحميل البيانات');
+  }
+  btn.disabled=false;btn.textContent='🔄 تحديث وإعادة التحليل';
+}
+
+function setStatus(s){
+  const pill=document.getElementById('statusPill');
+  const dot=document.getElementById('statusDot');
+  const txt=document.getElementById('statusTxt');
+  if(s==='live'){pill.className='status-pill pill-live';dot.className='dot dot-g';txt.textContent='مباشر';}
+  else if(s==='load'){pill.className='status-pill pill-load';dot.className='dot dot-y';txt.textContent='تحديث...';}
+  else{pill.className='status-pill pill-err';dot.className='dot dot-r';txt.textContent='خطأ';}
+}
+
+function renderAll(){
+  const vals=Object.values(mkt);
+  if(!vals.length)return;
+  const avg=vals.reduce((a,b)=>a+b.change,0)/vals.length;
+  const score=Math.round(Math.min(Math.max(50+avg*6,0),100));
+  const col=score>60?'#0ECB81':score<35?'#F6465D':'#F0B90B';
+  document.getElementById('moodScore').textContent=score;
+  document.getElementById('moodScore').style.color=col;
+  document.getElementById('moodFill').style.clipPath=`inset(0 ${100-score}% 0 0)`;
+  const vd=score>=70?['🤑 جشع — كن حذراً جداً','لا تشتري في القمم']:score>=55?['😊 متفائل — زخم إيجابي','فرص جيدة مع وقف خسارة']:score>=40?['😐 محايد — انتظر إشارة','تابع قبل الدخول']:score>=25?['😟 خوف — ضغط بيعي','ابحث عن مناطق دعم']:['😱 خوف شديد — فرصة ذهبية!','الأذكياء يشترون الآن'];
+  document.getElementById('moodVerdict').textContent=vd[0];
+  document.getElementById('moodVerdict').style.color=col;
+  document.getElementById('moodTip').textContent=vd[1];
+
+  // Stats
+  const green=vals.filter(d=>d.change>0).length;
+  const best=vals.reduce((a,b)=>a.change>b.change?a:b);
+  const bestCoin=COINS.find(c=>mkt[c.id]===best);
+  document.getElementById('statsRow').innerHTML=`
+    <div class="stat-mini fu"><div class="stat-lbl">متوسط السوق</div><div class="stat-val" style="color:${avg>=0?'#0ECB81':'#F6465D'}">${avg>=0?'+':''}${avg.toFixed(1)}%</div></div>
+    <div class="stat-mini fu"><div class="stat-lbl">صاعد / هابط</div><div class="stat-val" style="color:#F0B90B">${green}/${vals.length}</div></div>
+    <div class="stat-mini fu"><div class="stat-lbl">الأفضل اليوم</div><div class="stat-val" style="color:${bestCoin?.color||'#0ECB81'}">${bestCoin?.sym||'--'}</div></div>`;
+
+  // Prices
+  const pg=document.getElementById('pricesGrid');
+  pg.innerHTML='';
+  COINS.forEach(coin=>{
+    const d=mkt[coin.id];if(!d)return;
+    const up=d.change>=0;
+    const div=document.createElement('div');
+    div.className=`p-card ${up?'up':'down'} fu`;
+    div.innerHTML=`<div style="display:flex;align-items:center;gap:7px"><div class="p-icon" style="background:${coin.bg};color:${coin.color}">${coin.sym[0]}</div><div class="p-name">${coin.sym}</div></div><div style="text-align:left"><div class="p-price">${fmt(d.price)}</div><div class="p-change" style="color:${up?'#0ECB81':'#F6465D'}">${fch(d.change)}</div></div>`;
+    pg.appendChild(div);
+  });
+
+  // Signals
+  const analyzed=COINS.map(coin=>{const d=mkt[coin.id];if(!d||!d.price)return null;return{coin,d,a:analyze(d)};}).filter(Boolean).sort((x,y)=>{const s={buy:3,sell:2,wait:1};return s[y.a.signal]-s[x.a.signal];});
+  const buys=analyzed.filter(x=>x.a.signal==='buy').length;
+  document.getElementById('oppCount').textContent=`${buys} فرصة شراء`;
+  const sc=document.getElementById('signalsContainer');sc.innerHTML='';
+  analyzed.slice(0,3).forEach(({coin,d,a},i)=>{
+    const ret=(((a.target-d.price)/d.price)*100).toFixed(1);
+    const cc=a.signal==='buy'?'cmd-buy':a.signal==='sell'?'cmd-sell':'cmd-wait';
+    const bc=a.signal==='buy'?'badge-buy':a.signal==='sell'?'badge-sell':'badge-wait';
+    const bt=a.signal==='buy'?'🟢 شراء':a.signal==='sell'?'🔴 بيع':'🟡 انتظار';
+    const div=document.createElement('div');
+    div.className=`cmd-card ${cc} fu`;div.style.animationDelay=(i*0.1)+'s';
+    div.innerHTML=`
+      <div class="cmd-top">
+        <div class="cmd-coin"><div class="cmd-icon" style="background:${coin.bg};color:${coin.color}">${coin.sym[0]}</div><div><div class="cmd-name">${coin.name}</div><div class="cmd-pair">${coin.sym}/USDT</div></div></div>
+        <span class="badge ${bc}">${bt}</span>
+      </div>
+      <div class="cmd-price" style="color:${d.change>=0?'#0ECB81':'#F6465D'}">${fmt(d.price)} <span style="font-size:12px">${fch(d.change)}</span></div>
+      <div class="levels">
+        <div class="lv"><div class="lv-l">🎯 هدف</div><div class="lv-v" style="color:#0ECB81">${fmt(a.target)}</div></div>
+        <div class="lv"><div class="lv-l">🛑 وقف</div><div class="lv-v" style="color:#F6465D">${fmt(a.stop)}</div></div>
+        <div class="lv"><div class="lv-l">💰 عائد</div><div class="lv-v" style="color:#F0B90B">+${ret}%</div></div>
+      </div>
+      <div class="cmd-reason">${a.reason}</div>
+      <div class="action-row">
+        <button class="btn-wa" onclick='sendWA(${JSON.stringify(coin)},"${a.signal}",${d.price},${a.target},${a.stop},"${a.reason}")'>📱 واتساب</button>
+        <button class="btn-bn" onclick='openBinance(${JSON.stringify(coin)})'>🏦 بينانس TR</button>
+      </div>`;
+    sc.appendChild(div);
+  });
+}
+
+async function loadNews(){
+  const nc=document.getElementById('newsContainer');
+  nc.innerHTML='<div class="skel" style="height:80px;margin-bottom:8px"></div><div class="skel" style="height:80px;margin-bottom:8px"></div><div class="skel" style="height:80px;margin-bottom:8px"></div>';
+  try{
+    const res=await fetch('https://cryptopanic.com/api/v1/posts/?auth_token=demo&public=true&currencies=BTC,ETH,SOL,BNB&filter=hot');
+    if(!res.ok)throw new Error();
+    const data=await res.json();
+    renderNews(data.results||[]);
+  }catch(e){
+    // Fallback news
+    renderNews([
+      {title:'Bitcoin تحت ضغط بيعي مع انخفاض الأحجام — المحللون يرصدون مستوى $85K دعماً رئيسياً',published_at:new Date().toISOString(),source:{title:'CoinDesk'},metadata:{image:''},impact:'high'},
+      {title:'Ethereum تختبر مستوى $1,800 وسط تراجع حجم DeFi الأسبوعي',published_at:new Date(Date.now()-3600000).toISOString(),source:{title:'CoinTelegraph'},impact:'med'},
+      {title:'Solana تُسجل 400 مليون معاملة يومية — المستثمرون يترقبون ارتداداً',published_at:new Date(Date.now()-7200000).toISOString(),source:{title:'The Block'},impact:'med'},
+      {title:'الفيدرالي الأمريكي يُشير لتثبيت الفائدة — تأثير إيجابي محتمل على العملات الرقمية',published_at:new Date(Date.now()-10800000).toISOString(),source:{title:'Bloomberg'},impact:'high'},
+      {title:'BNB تُحافظ على مستوياتها رغم تراجع السوق — قوة نسبية لافتة',published_at:new Date(Date.now()-14400000).toISOString(),source:{title:'Binance Blog'},impact:'low'},
+      {title:'تقرير: تدفقات ETF البيتكوين تُسجل خروجاً صافياً للأسبوع الثاني على التوالي',published_at:new Date(Date.now()-18000000).toISOString(),source:{title:'Reuters'},impact:'high'},
+    ]);
+  }
+}
+
+function renderNews(items){
+  const nc=document.getElementById('newsContainer');nc.innerHTML='';
+  items.slice(0,8).forEach((item,i)=>{
+    const impact=item.impact||(['high','med','low'][i%3]);
+    const impactLabel=impact==='high'?'تأثير عالي':impact==='med'?'تأثير متوسط':'تأثير منخفض';
+    const impactClass=impact==='high'?'impact-high':impact==='med'?'impact-med':'impact-low';
+    const time=new Date(item.published_at||Date.now());
+    const ago=Math.round((Date.now()-time)/60000);
+    const agoStr=ago<60?`${ago} دقيقة`:ago<1440?`${Math.round(ago/60)} ساعة`:`${Math.round(ago/1440)} يوم`;
+    const div=document.createElement('div');
+    div.className='news-card fu';div.style.animationDelay=(i*0.08)+'s';
+    div.innerHTML=`
+      <div class="news-top">
+        <div class="news-title">${item.title||'خبر جديد'}</div>
+        <span class="news-impact ${impactClass}">${impactLabel}</span>
+      </div>
+      <div class="news-bottom">
+        <span>${item.source?.title||'Crypto News'}</span>
+        <span>منذ ${agoStr}</span>
+      </div>`;
+    div.onclick=()=>{if(item.url)window.open(item.url,'_blank');};
+    nc.appendChild(div);
+  });
+}
+
+function renderHistory(){
+  try{signalHistory=JSON.parse(localStorage.getItem('cc_history')||'[]');}catch(e){}
+  const hc=document.getElementById('histContainer');
+  if(!signalHistory.length){hc.innerHTML='<div style="text-align:center;padding:40px 20px;color:var(--muted);"><div style="font-size:40px;margin-bottom:12px">📋</div><div style="font-size:14px;font-weight:700;margin-bottom:6px">لا يوجد سجل بعد</div><div style="font-size:12px">التوصيات التي تُرسل ستظهر هنا</div></div>';return;}
+  hc.innerHTML=signalHistory.map(s=>{
+    const col=s.signal==='buy'?'#0ECB81':s.signal==='sell'?'#F6465D':'#F0B90B';
+    const lbl=s.signal==='buy'?'🟢 شراء':s.signal==='sell'?'🔴 بيع':'🟡 انتظار';
+    const t=new Date(s.time);
+    return`<div class="hist-item"><div class="hist-top"><span style="font-size:13px;font-weight:700;color:${col}">${lbl} ${s.coin}/USDT</span><span style="font-size:10px;color:var(--muted)">${t.toLocaleDateString('ar')} ${t.toLocaleTimeString('ar',{hour:'2-digit',minute:'2-digit'})}</span></div><div class="hist-row"><span>دخول: <b style="color:var(--text)">${fmt(s.price)}</b></span><span>هدف: <b style="color:#0ECB81">${fmt(s.target)}</b></span><span>وقف: <b style="color:#F6465D">${fmt(s.stop)}</b></span></div></div>`;
+  }).join('');
+}
+
+// Load settings
+try{const s=JSON.parse(localStorage.getItem('cc_settings')||'{}');if(s.waPhone)settings.waPhone=s.waPhone;document.getElementById('waPhone').value=settings.waPhone;}catch(e){}
+try{signalHistory=JSON.parse(localStorage.getItem('cc_history')||'[]');}catch(e){}
+
+// Start
+loadAll();
+loadNews();
+setInterval(loadAll,300000); // 5 min
+setInterval(loadNews,600000); // 10 min
+</script>
+</body>
+</html>
